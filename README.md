@@ -12,6 +12,11 @@ I personally use it on my Linux (Ubuntu) system and it works well.
 
 # Usage
 - Clone the repo
+- Generate an API key in the Jellyfin dashboard.
+      - Go to Dashboard -> API Keys
+      - Hit the + icon
+      - Enter any name and click OK
+- Copy the API key generated above, and paste it into the script in place of '<Insert your token here>'
 - Use a platform-specific method to run the script in the background, preferably on system boot
 - Enjoy!
 
