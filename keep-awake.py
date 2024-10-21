@@ -19,7 +19,7 @@ def keep_system_awake():
 
 def get_api_data():
     api_url = "http://127.0.0.1:8096/Sessions"
-    headers = {"X-Emby-Token": "7245c64c15294f8686ba8f321258434b"}
+    headers = {"X-Emby-Token": "<Insert your token here>"}
 
     try:
         response = requests.get(api_url, headers=headers)
