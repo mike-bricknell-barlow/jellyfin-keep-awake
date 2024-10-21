@@ -4,14 +4,18 @@ import platform
 import subprocess
 import ctypes
 from datetime import datetime, timedelta
+import os
+import subprocess
 
 def keep_system_awake():
     # Keep system awake using platform-specific method
+    env = os.environ.copy()
+    env["DISPLAY"] = ":0"
     system_platform = platform.system()
     if system_platform == "Windows":
         ctypes.windll.kernel32.SetThreadExecutionState(0x80000002)
     elif system_platform in ["Linux", "Darwin"]:
-        subprocess.run(["xset", "s", "reset"])
+        subprocess.run(["xset", "s", "reset"], env=env)
 
 def get_api_data():
     api_url = "http://127.0.0.1:8096/Sessions"
@@ -37,18 +41,22 @@ def process_api_data(api_data):
         sessions = api_data
 
         for session in sessions:
-            last_active = session.get("LastActivityDate")
-            is_active = session.get("IsActive")
+            now_playing_item = session.get("NowPlayingItem", "");
+            now_playing_queue = session.get("NowPlayingQueueFullItems", [])
 
-            last_active = last_active[:-2]
-            last_active = last_active + "Z"
+            if now_playing_queue or now_playing_item:
+                last_active = session.get("LastActivityDate")
+                last_active = last_active[:-2]
+                last_active = last_active + "Z"
 
-            if is_active:
                 time_difference = datetime.utcnow() - datetime.strptime(last_active, "%Y-%m-%dT%H:%M:%S.%fZ")
-                if time_difference < timedelta(minutes=15):
-                    print(session.get("Client"))
-                    print("\n \n")
+                if time_difference < timedelta(minutes=5):
+                    print(session.get("Client") + ", keeping awake")
                     keep_system_awake()
+                else:
+                    print(session.get("Client") + ", nothing playing")
+            else:
+                print(session.get("Client") + ", nothing playing")
 
 if __name__ == "__main__":
     while True:
